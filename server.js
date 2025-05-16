@@ -7,6 +7,7 @@ const path = require('path');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const { MongoClient } = require('mongodb');
 const authRoutes = require('./routes/auth');
 const crypto = require('crypto');
@@ -24,6 +25,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: mongoURI,
+        ttl: 24 * 60 * 60, // 1 day
+        autoRemove: 'native'
+    }),
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
